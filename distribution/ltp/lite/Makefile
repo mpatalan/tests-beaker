@@ -135,6 +135,8 @@ run: $(TARGET) patch build
 	@echo "============ Run Tests ============"
 	LANG=C ./runtest.sh
 
+DEBUG_KERNEL = $(shell uname -r | grep debug && echo yes || echo no)
+
 $(METADATA):
 	touch $(METADATA)
 	@echo "Name:            $(TEST)" >$(METADATA)
@@ -146,7 +148,12 @@ $(METADATA):
 	@echo "RhtsRequires:    kernel-kernel-distribution-ltp-include" >> $(METADATA)
 	@echo "Requires:        automake autoconf procmail flex bison rsyslog sysklogd util-linux-ng rpm-build" >> $(METADATA)
 	@echo "Requires:        gcc wget ntpdate kernel-headers redhat-lsb bc numactl" >> $(METADATA)
-	@echo "Requires:        kernel-devel libaio-devel libcap-devel numactl-devel libcgroup strace hexdump virt-what" >> $(METADATA)
+	@echo "Requires:        libaio-devel libcap-devel numactl-devel libcgroup strace hexdump virt-what" >> $(METADATA)
+ifeq ($(DEBUG_KERNEL),yes)
+    @echo "Requires:        kernel-debug-devel" >> $(METADATA)
+else
+    @echo "Requires:        kernel-devel" >> $(METADATA)
+endif
 	@echo "Owner:           Kernel General Test Team <kernel-general-test-team@redhat.com>" >>$(METADATA)
 	@echo "Releases:        RHEL6 RHEL7 RedHatEnterpriseLinux7 RedHatEnterpriseLinuxPegas7 RedHatEnterpriseLinuxAlternateArchitectures7 RedHatEnterpriseLinux8 Fedora25 Fedora26 Fedorarawhide" >>$(METADATA)
 	@echo "Type:            KernelTier0 KernelTier1" >>$(METADATA)
